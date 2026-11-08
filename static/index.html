@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PixelPal</title>
+  <meta name="description" content="PixelPal - remove backgrounds, resize, compress, convert and watermark images in bulk. Free, private and no sign-up.">
+  <meta name="theme-color" content="#7c3aed">
+  <link rel="icon" href="static/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+  <link rel="stylesheet" href="static/css/styles.css?v=1.0.0">
+  <script src="static/js/theme.js?v=1.0.0"></script>
+  <script type="module" src="static/js/app.js?v=1.0.0"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="./" aria-label="PixelPal home">
+        <img class="brand-mark" src="static/favicon.svg" alt="" width="30" height="30">
+        <span>PixelPal</span>
+      </a>
+      <nav class="header-nav">
+        <a class="nav-link" href="https://github.com/Insofury/pixelpal" target="_blank" rel="noopener">GitHub</a>
+        <button class="icon-btn" id="themeBtn" type="button" aria-label="Toggle dark mode" title="Toggle dark mode">
+          <svg class="icon icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
+          <svg class="icon icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <p class="eyebrow">Free · Private · No sign-up</p>
+      <h1>Remove backgrounds, resize, compress and watermark, <span class="grad">in bulk.</span></h1>
+      <p class="lead">Drop in up to 50 images, choose what to do, and download them one by one or as a ZIP. <span id="privacyText">Images are processed in memory and never stored.</span></p>
+    </section>
+
+    <form class="workspace" id="form" novalidate>
+      <!-- 1. Files -->
+      <section class="panel" aria-labelledby="filesTitle">
+        <div class="panel-head">
+          <h2 id="filesTitle"><span class="step">1</span>Add images</h2>
+          <button type="button" class="link-btn" id="clearBtn" hidden>Clear all</button>
+        </div>
+        <label class="dropzone" id="dropzone" for="fileInput">
+          <input type="file" id="fileInput" multiple hidden
+                 accept=".png,.jpg,.jpeg,.webp,.gif,.bmp,.tif,.tiff,image/png,image/jpeg,image/webp,image/gif,image/bmp,image/tiff">
+          <svg class="dz-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21"/></svg>
+          <strong>Drop images here or <span class="link">browse</span></strong>
+          <span class="dz-hint">PNG, JPG, WebP, GIF, BMP or TIFF · up to <span id="maxMb">15</span> MB each · or paste with Ctrl+V</span>
+        </label>
+        <ul class="file-grid" id="fileGrid" aria-label="Selected images"></ul>
+        <p class="files-summary" id="filesSummary" hidden></p>
+      </section>
+
+      <!-- 2. Options -->
+      <section class="panel" aria-labelledby="optionsTitle">
+        <div class="panel-head">
+          <h2 id="optionsTitle"><span class="step">2</span>Choose what to do</h2>
+          <button type="button" class="link-btn" id="resetBtn">Reset</button>
+        </div>
+
+        <div class="presets" role="group" aria-label="Quick presets">
+          <button type="button" class="chip" data-preset="web">Web-ready</button>
+          <button type="button" class="chip" data-preset="product">Product photo</button>
+          <button type="button" class="chip" data-preset="profile">Profile picture</button>
+          <button type="button" class="chip" data-preset="instagram">Instagram square</button>
+          <button type="button" class="chip" data-preset="small">Under 200 KB</button>
+        </div>
+
+        <!-- Background -->
+        <div class="tool" id="bgTool">
+          <label class="tool-head">
+            <span class="tool-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg></span>
+            <span class="tool-text"><strong>Remove background</strong><small id="bgSub">AI cut-out of the main subject</small></span>
+            <input type="checkbox" class="switch" id="bgOn" name="bgOn">
+          </label>
+          <div class="tool-body" id="bgBody" hidden>
+            <div class="field">
+              <span class="field-label">New background</span>
+              <div class="seg" role="radiogroup" aria-label="New background">
+                <label><input type="radio" name="bgFill" value="transparent" checked><span>Transparent</span></label>
+                <label><input type="radio" name="bgFill" value="#ffffff"><span>White</span></label>
+                <label><input type="radio" name="bgFill" value="custom"><span>Colour</span></label>
+              </div>
+              <input type="color" class="color" id="bgColor" name="bgColor" value="#e2e8f0" aria-label="Background colour" hidden>
+            </div>
+            <p class="hint">Works best on photos with one clear subject: people, products, pets.</p>
+          </div>
+        </div>
+
+        <!-- Resize -->
+        <div class="tool" id="resizeTool">
+          <label class="tool-head">
+            <span class="tool-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span>
+            <span class="tool-text"><strong>Resize</strong><small>Fit, crop to an exact size, or scale</small></span>
+            <input type="checkbox" class="switch" id="resizeOn" name="resizeOn">
+          </label>
+          <div class="tool-body" id="resizeBody" hidden>
+            <div class="seg" role="radiogroup" aria-label="Resize mode">
+              <label><input type="radio" name="resizeMode" value="fit" checked><span>Fit inside</span></label>
+              <label><input type="radio" name="resizeMode" value="cover"><span>Crop to size</span></label>
+              <label><input type="radio" name="resizeMode" value="percent"><span>Scale %</span></label>
+            </div>
+            <div class="row" id="dimsRow">
+              <label class="input-wrap"><span>Width</span><input type="number" id="width" name="width" min="1" max="10000" inputmode="numeric" placeholder="auto" value="1920"><em>px</em></label>
+              <span class="times">×</span>
+              <label class="input-wrap"><span>Height</span><input type="number" id="height" name="height" min="1" max="10000" inputmode="numeric" placeholder="auto" value="1920"><em>px</em></label>
+            </div>
+            <div class="row" id="percentRow" hidden>
+              <label class="input-wrap"><span>Scale</span><input type="number" id="percent" name="percent" min="1" max="1000" inputmode="numeric" value="50"><em>%</em></label>
+            </div>
+            <label class="check" id="upscaleRow"><input type="checkbox" id="upscale" name="upscale"><span>Enlarge images that are smaller than this</span></label>
+            <p class="hint" id="resizeHint">Keeps the shape. Leave width or height empty to set just one side.</p>
+          </div>
+        </div>
+
+        <!-- Watermark -->
+        <div class="tool" id="wmTool">
+          <label class="tool-head">
+            <span class="tool-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7V5h16v2M9 19h6M12 5v14"/></svg></span>
+            <span class="tool-text"><strong>Watermark</strong><small>Add your name, brand or ©</small></span>
+            <input type="checkbox" class="switch" id="wmOn" name="wmOn">
+          </label>
+          <div class="tool-body" id="wmBody" hidden>
+            <label class="input-wrap wide"><span>Text</span><input type="text" id="wmText" name="wmText" maxlength="120" placeholder="© Your name"></label>
+            <div class="wm-grid">
+              <div class="field">
+                <span class="field-label">Position</span>
+                <div class="pos-grid" role="radiogroup" aria-label="Watermark position" id="posGrid">
+                  <label title="Top left"><input type="radio" name="wmPos" value="top-left"><span></span></label>
+                  <label title="Top"><input type="radio" name="wmPos" value="top"><span></span></label>
+                  <label title="Top right"><input type="radio" name="wmPos" value="top-right"><span></span></label>
+                  <label title="Left"><input type="radio" name="wmPos" value="left"><span></span></label>
+                  <label title="Centre"><input type="radio" name="wmPos" value="center"><span></span></label>
+                  <label title="Right"><input type="radio" name="wmPos" value="right"><span></span></label>
+                  <label title="Bottom left"><input type="radio" name="wmPos" value="bottom-left"><span></span></label>
+                  <label title="Bottom"><input type="radio" name="wmPos" value="bottom"><span></span></label>
+                  <label title="Bottom right"><input type="radio" name="wmPos" value="bottom-right" checked><span></span></label>
+                </div>
+                <label class="check"><input type="checkbox" id="wmTile" name="wmTile"><span>Repeat across the image</span></label>
+              </div>
+              <div class="field sliders">
+                <label class="slider"><span>Opacity <output id="wmOpacityOut">60%</output></span><input type="range" id="wmOpacity" name="wmOpacity" min="5" max="100" value="60"></label>
+                <label class="slider"><span>Size <output id="wmSizeOut">5%</output></span><input type="range" id="wmSize" name="wmSize" min="1" max="20" step="0.5" value="5"></label>
+                <label class="color-row"><span>Colour</span><input type="color" class="color" id="wmColor" name="wmColor" value="#ffffff"></label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Format -->
+        <div class="tool tool-static" id="formatTool">
+          <div class="tool-head">
+            <span class="tool-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 15h6"/></svg></span>
+            <span class="tool-text"><strong>Format &amp; compression</strong><small>Convert and shrink the file size</small></span>
+          </div>
+          <div class="tool-body">
+            <div class="seg" role="radiogroup" aria-label="Output format">
+              <label><input type="radio" name="format" value="original" checked><span>Keep</span></label>
+              <label><input type="radio" name="format" value="jpeg"><span>JPG</span></label>
+              <label><input type="radio" name="format" value="png"><span>PNG</span></label>
+              <label><input type="radio" name="format" value="webp"><span>WebP</span></label>
+            </div>
+            <p class="hint" id="formatHint"></p>
+            <label class="slider" id="qualityRow"><span>Quality <output id="qualityOut">82</output></span><input type="range" id="quality" name="quality" min="10" max="100" value="82"></label>
+            <div class="row">
+              <label class="input-wrap"><span>Max file size</span><input type="number" id="targetKb" name="targetKb" min="1" max="100000" inputmode="numeric" placeholder="optional"><em>KB</em></label>
+              <label class="input-wrap"><span>Name ending</span><input type="text" id="suffix" name="suffix" maxlength="30" placeholder="e.g. -small"></label>
+            </div>
+            <label class="check" id="pngColorsRow"><input type="checkbox" id="pngColors" name="pngColors"><span>Reduce PNG colours (much smaller, slight quality loss)</span></label>
+            <label class="check"><input type="checkbox" id="keepMeta" name="keepMeta"><span>Keep photo info (EXIF). Off removes camera and GPS location data.</span></label>
+          </div>
+        </div>
+      </section>
+
+      <!-- Action bar -->
+      <div class="action-bar">
+        <div class="action-info">
+          <p class="engine-status" id="engineStatus" role="status" hidden></p>
+          <p class="form-error" id="formError" role="alert" hidden></p>
+        </div>
+        <button type="submit" class="btn primary lg" id="processBtn" disabled>
+          <span class="spinner" aria-hidden="true"></span><span class="btn-label">Add images to start</span>
+        </button>
+      </div>
+      <div class="progress" id="progress" hidden><div class="progress-bar" id="progressBar"></div></div>
+    </form>
+
+    <!-- Results -->
+    <section class="results" id="results" hidden aria-labelledby="resultsTitle">
+      <div class="results-head">
+        <div>
+          <h2 id="resultsTitle">Results</h2>
+          <p class="results-summary" id="resultsSummary" aria-live="polite"></p>
+        </div>
+        <button type="button" class="btn primary" id="zipBtn" disabled>
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+          Download all (ZIP)
+        </button>
+      </div>
+      <ul class="result-grid" id="resultGrid"></ul>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p><strong>PixelPal</strong> · Open source · <a href="https://github.com/Insofury/pixelpal" target="_blank" rel="noopener">GitHub</a></p>
+      <p class="muted">Built with Python, Pillow, rembg (U²-Net) and FastAPI. No tracking, no accounts.</p>
+    </div>
+  </footer>
+
+  <dialog class="compare" id="compareDialog" aria-labelledby="compareTitle">
+    <div class="compare-head">
+      <h3 id="compareTitle">Before / after</h3>
+      <button type="button" class="icon-btn" id="compareClose" aria-label="Close">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="compare-stage checker" id="compareStage">
+      <img id="compareBefore" alt="Original image">
+      <div class="compare-after" id="compareAfterWrap"><img id="compareAfter" alt="Processed image"></div>
+      <div class="compare-handle" id="compareHandle" aria-hidden="true"></div>
+      <span class="compare-tag left">Before</span>
+      <span class="compare-tag right">After</span>
+    </div>
+    <input type="range" class="compare-range" id="compareRange" min="0" max="100" value="50" aria-label="Drag to compare before and after">
+    <p class="compare-meta" id="compareMeta"></p>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" hidden></div>
+</body>
+</html>

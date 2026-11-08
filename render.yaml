@@ -1,0 +1,16 @@
+# Render Blueprint - one-click deploy: https://render.com/deploy
+# The free plan has 512 MB of RAM, so this keeps the image size limit modest.
+services:
+  - type: web
+    name: pixelpal
+    runtime: docker
+    plan: free
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: TRUST_PROXY
+        value: "true"
+      - key: MAX_MEGAPIXELS
+        value: "25"
+      - key: BG_CONCURRENCY
+        value: "1"
