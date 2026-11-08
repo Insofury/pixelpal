@@ -15,6 +15,7 @@ import hashlib
 import json
 import shutil
 import sys
+import time
 import urllib.request
 from pathlib import Path
 
@@ -70,17 +71,29 @@ def patch_model(data: bytes) -> bytes:
     return patched
 
 
-def fetch_model() -> Path:
+def local_model_files() -> list[Path]:
+    """Where a u2netp download may already be: our cache, then rembg's (new and old layout)."""
+    home = Path.home()
+    return [MODEL_CACHE, home / ".rembg" / "models" / "u2netp" / "u2netp.onnx", home / ".u2net" / "u2netp.onnx"]
+
+
+def fetch_model(attempts: int = 5) -> Path:
     """Download the model once (checked against its SHA-256) and cache it in .cache/."""
-    candidates = [MODEL_CACHE, Path.home() / ".u2net" / "u2netp.onnx"]  # rembg's own cache
-    for path in candidates:
+    for path in local_model_files():
         if path.is_file() and _sha256(path) == MODEL["sha256"]:
             return path
     MODEL_CACHE.parent.mkdir(parents=True, exist_ok=True)
     tmp = MODEL_CACHE.with_suffix(".part")
-    print(f"Downloading {MODEL['url']} ...")
-    with urllib.request.urlopen(MODEL["url"], timeout=120) as response, tmp.open("wb") as out:  # noqa: S310
-        shutil.copyfileobj(response, out)
+    for attempt in range(1, attempts + 1):
+        print(f"Downloading {MODEL['url']} (attempt {attempt}) ...")
+        try:
+            with urllib.request.urlopen(MODEL["url"], timeout=120) as response, tmp.open("wb") as out:  # noqa: S310
+                shutil.copyfileobj(response, out)
+            break
+        except OSError as exc:  # network errors and HTTP 5xx from GitHub's release CDN
+            if attempt == attempts:
+                raise SystemExit(f"Couldn't download the model: {exc}") from exc
+            time.sleep(10 * attempt)
     if _sha256(tmp) != MODEL["sha256"]:
         tmp.unlink()
         raise SystemExit("Model checksum mismatch - refusing to publish it.")

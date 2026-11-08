@@ -9,6 +9,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         python-version: ["3.11", "3.12", "3.13"]
     steps:
@@ -18,6 +19,18 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache: pip
       - run: pip install -r requirements-dev.txt
-      # The u2netp model (4.5 MB) lets the rembg-parity tests run too.
-      - run: python -c "from rembg import new_session; new_session('u2netp')"
+      # The u2netp model (4.5 MB) lets the rembg-parity tests run too. Cached between runs;
+      # if GitHub's release download is down, those two tests are skipped instead of failing.
+      - uses: actions/cache@v4
+        with:
+          path: ~/.rembg/models
+          key: rembg-u2netp-v1
+      - name: Download the background-removal model
+        continue-on-error: true
+        run: |
+          for i in 1 2 3 4 5; do
+            python -c "from rembg import new_session; new_session('u2netp')" && exit 0
+            sleep $((i * 10))
+          done
+          exit 1
       - run: pytest -q

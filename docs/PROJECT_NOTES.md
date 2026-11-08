@@ -342,7 +342,7 @@ Returns the image (`image/png`, `image/jpeg` or `image/webp`). Header `X-PixelPa
    `/pixelpal/`).
 2. Copies the 7 browser modules to `_site/py/app/`. A test makes sure they only import the
    standard library, Pillow and NumPy - never FastAPI or rembg.
-3. Downloads `u2netp.onnx` from rembg's releases (or reuses `~/.u2net`), **verifies its
+3. Downloads `u2netp.onnx` from rembg's releases (or reuses a copy rembg already downloaded), **verifies its
    SHA-256**, and patches it for WebGPU:
    - The model's 33 MaxPool layers use `ceil_mode=1`, which onnxruntime-web's WebGPU
      backend can't run. With a 320×320 input every pooled size is even (320 → 160 → … →

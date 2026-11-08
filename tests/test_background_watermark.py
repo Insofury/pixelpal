@@ -57,9 +57,12 @@ def test_background_removal_needs_a_model():
     assert info.value.status == 503
 
 
-MODEL_FILE = Path.home() / ".u2net" / "u2netp.onnx"
+MODEL_FILE = next(
+    (p for p in (Path.home() / ".rembg/models/u2netp/u2netp.onnx", Path.home() / ".u2net/u2netp.onnx") if p.is_file()),
+    None,
+)
 needs_model = pytest.mark.skipif(
-    importlib.util.find_spec("rembg") is None or not MODEL_FILE.is_file(),
+    importlib.util.find_spec("rembg") is None or MODEL_FILE is None,
     reason="rembg / the u2netp model isn't installed",
 )
 

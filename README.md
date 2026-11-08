@@ -79,7 +79,7 @@ python run.py
 ```
 
 Open **http://localhost:8000**. The first background removal downloads the u2netp model
-(4.5 MB) into `~/.u2net`. Settings (limits, model, rate limits) are in
+(4.5 MB) into `~/.rembg/models`. Settings (limits, model, rate limits) are in
 [`.env.example`](.env.example).
 
 ## Deploy (free)
@@ -170,7 +170,7 @@ pytest -q
 
 Two tests also check that the browser's background-removal maths matches rembg, and that
 the WebGPU-compatible model gives identical output. They run when the u2netp model is
-present in `~/.u2net`.
+present (rembg downloads it to `~/.rembg/models`).
 
 ## Privacy
 

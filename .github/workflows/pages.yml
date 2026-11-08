@@ -25,6 +25,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      # The build downloads the u2netp model (checked by SHA-256); keep it between runs.
+      - uses: actions/cache@v4
+        with:
+          path: .cache
+          key: u2netp-309c8469
       - name: Build static site
         run: python scripts/build_pages.py
       - uses: actions/upload-pages-artifact@v3
